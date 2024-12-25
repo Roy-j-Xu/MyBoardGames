@@ -1,24 +1,39 @@
 using Microsoft.AspNetCore.Mvc;
+using MyBoardGameServer.Models;
+using MyBoardGameServer.Repositories;
 
 namespace MyBoardGameServer.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class WeatherForecastController : ControllerBase
+    public class WeatherForecastController(
+        ILogger<WeatherForecastController> logger,
+        UserRepository userRepository
+            ) : ControllerBase
     {
+        private readonly UserRepository _userRepository = userRepository;
+
         private static readonly string[] Summaries = new[]
         {
             "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
         };
 
-        private readonly ILogger<WeatherForecastController> _logger;
+        private readonly ILogger<WeatherForecastController> _logger = logger;
 
-        public WeatherForecastController(ILogger<WeatherForecastController> logger)
+        [HttpGet("AddUser")]
+        public User AddUser()
         {
-            _logger = logger;
+            return _userRepository.Add(new User { UserName = "Test" });
+            //return _userRepository.GetAll();
         }
 
-        [HttpGet(Name = "GetWeatherForecast")]
+        [HttpGet("Users")]
+        public IEnumerable<User>  GetUsers()
+        {
+            return _userRepository.GetAll();
+        }
+
+        [HttpGet("GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
