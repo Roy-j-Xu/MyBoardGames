@@ -4,8 +4,10 @@ using MyBoardGameServer.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Get flags
+bool useDatabase = builder.Configuration["UseDatabase"] == "true";
 
+// Add services to the container.
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddControllers();
 
@@ -13,22 +15,42 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseInMemoryDatabase("InMemoryDb")  // In-memory database
-);
 
-
-var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
+if (useDatabase || builder.Environment.IsProduction())
 {
-    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    context.Users.Add(new MyBoardGameServer.Models.User { UserName = "Test"});
-    context.SaveChanges();
+    string? connectionString = builder.Configuration.GetConnectionString("Postgres");
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseNpgsql(connectionString)
+    );
+}
+else
+{
+    builder.Services.AddDbContext<ApplicationDbContext>(options =>
+        options.UseInMemoryDatabase("InMemoryDb")  // In-memory database
+    );
 }
 
-    // Configure the HTTP request pipeline.
-    if (app.Environment.IsDevelopment())
+
+// Build app
+var app = builder.Build();
+var logger = app.Services.GetService<ILogger<Program>>();
+
+// Some random logging
+logger?.LogInformation("Hello World");
+logger?.LogInformation(useDatabase.ToString());
+
+
+
+// Initialize data
+//using (var scope = app.Services.CreateScope())
+//{
+//    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//    context.Users.Add(new MyBoardGameServer.Models.User { UserName = "Test" });
+//    context.SaveChanges();
+//}
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using MyBoardGameServer.Models;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MyBoardGameServer.Data
 {

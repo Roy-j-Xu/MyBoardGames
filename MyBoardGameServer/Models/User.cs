@@ -1,10 +1,15 @@
-﻿namespace MyBoardGameServer.Models
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace MyBoardGameServer.Models
 {
+    [Table("users")]
     public class User
     {
+        [Column("id")]
         public long Id { get; set; }
-        public required string UserName { get; set; }
 
+        [Column("username")]
+        public required string Username { get; set; }
 
     }
 }
