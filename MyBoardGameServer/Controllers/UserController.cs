@@ -5,26 +5,25 @@ using MyBoardGameServer.Repositories;
 namespace MyBoardGameServer.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
-    public class WeatherForecastController(
-        ILogger<WeatherForecastController> logger,
+    [Route("users")]
+    public class UserController(
+        ILogger<UserController> logger,
         UserRepository userRepository
             ) : ControllerBase
     {
         private readonly UserRepository _userRepository = userRepository;
 
-        private readonly ILogger<WeatherForecastController> _logger = logger;
+        private readonly ILogger<UserController> _logger = logger;
 
 
         [HttpGet("AddUser")]
         public User AddUser()
         {
             return _userRepository.Add(new User { Username = "Test" });
-            //return _userRepository.GetAll();
         }
 
-        [HttpGet("Users")]
-        public IEnumerable<User>  GetUsers()
+        [HttpGet()]
+        public IEnumerable<User> GetUsers()
         {
             return _userRepository.GetAll();
         }

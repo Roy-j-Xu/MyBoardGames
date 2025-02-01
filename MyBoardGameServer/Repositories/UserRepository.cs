@@ -1,17 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
-using MyBoardGameServer.Data;
+﻿using MyBoardGameServer.Data;
 using MyBoardGameServer.Models;
 
 namespace MyBoardGameServer.Repositories
 {
-    public class UserRepository
+    public class UserRepository(ApplicationDbContext context)
     {
-        private readonly ApplicationDbContext _context;
-
-        public UserRepository(ApplicationDbContext context) 
-        {
-            _context = context;
-        }
+        private readonly ApplicationDbContext _context = context;
 
         public IEnumerable<User> GetAll()
         {
