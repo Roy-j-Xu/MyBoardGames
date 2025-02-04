@@ -11,14 +11,13 @@ namespace MyBoardGameServer.Controllers
         UserRepository userRepository
             ) : ControllerBase
     {
-        private readonly UserRepository _userRepository = userRepository;
-
         private readonly ILogger<UserController> _logger = logger;
-
+        private readonly UserRepository _userRepository = userRepository;
 
         [HttpGet("AddUser")]
         public User AddUser()
         {
+            _logger.LogInformation("Added new user \"Test\".");
             return _userRepository.Add(new User { Username = "Test" });
         }
 

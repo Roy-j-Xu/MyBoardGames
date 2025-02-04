@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MyBoardGameServer.Core;
 using MyBoardGameServer.Data;
 using MyBoardGameServer.Repositories;
 
@@ -18,7 +19,12 @@ namespace MyBoardGameServer
 
             var app = BuildApplication();
 
-            InitializeData(app);
+            if (app == null) { return; }
+
+            if (!_flags["UseDatabase"])
+            {
+                InitializeData(app);
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -27,9 +33,13 @@ namespace MyBoardGameServer
                 app.UseSwaggerUI();
             }
 
+            app.UseCors("Frontend");
+
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
+
+            app.MapHub<GameHub>("/games");
 
             app.MapControllers();
 
@@ -39,43 +49,56 @@ namespace MyBoardGameServer
         public WebApplication BuildApplication()
         {
             var services = _builder.Services;
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy(name: "Frontend",
+                                  policy =>
+                                  {
+                                      policy.WithOrigins("http://localhost:4200");
+                                      policy.AllowAnyHeader();
+                                      policy.AllowAnyMethod();
+                                      policy.AllowCredentials();
+                                  });
+            });
+
             // Add services to the container.
             services.AddScoped<UserRepository>();
             services.AddControllers();
+
+            services.AddSignalR();
 
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen();
 
             // Database flag
-            //if (_flags["UseDatabase"])
+            if (_flags["UseDatabase"])
             {
                 string? connectionString = _builder.Configuration.GetConnectionString("Postgres");
                 services.AddDbContext<ApplicationDbContext>(options =>
                     options.UseNpgsql(connectionString)
                 );
             }
-            //else
-            //{
-            //    services.AddDbContext<ApplicationDbContext>(options =>
-            //        options.UseInMemoryDatabase("InMemoryDb")  // In-memory database
-            //    );
-            //}
+            else
+            {
+                services.AddDbContext<ApplicationDbContext>(options =>
+                    options.UseInMemoryDatabase("InMemoryDb")  // In-memory database
+                );
+            }
+
 
             return _builder.Build();
         }
 
-        private void InitializeData(WebApplication? app)
+        private void InitializeData(WebApplication app)
         {
-            if (!_flags["UseDatabase"] && app != null)
+            // Initialize data
+            using (var scope = app.Services.CreateScope())
             {
-                // Initialize data
-                using (var scope = app.Services.CreateScope())
-                {
-                    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                    context.Users.Add(new Models.User { Username = "In-Memory User" });
-                    context.SaveChanges();
-                }
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                context.Users.Add(new Models.User { Username = "In-Memory User" });
+                context.SaveChanges();
             }
         }
 
