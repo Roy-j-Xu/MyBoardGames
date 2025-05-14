@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using MyBoardGameServer.Models;
+using MyBoardGameServer.Core.Models;
 
 namespace MyBoardGameServer.Data
 {

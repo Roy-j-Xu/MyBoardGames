@@ -1,5 +1,5 @@
-﻿using MyBoardGameServer.Data;
-using MyBoardGameServer.Models;
+﻿using MyBoardGameServer.Core.Models;
+using MyBoardGameServer.Data;
 
 namespace MyBoardGameServer.Repositories
 {

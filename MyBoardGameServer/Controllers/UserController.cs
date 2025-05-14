@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
-using MyBoardGameServer.Models;
+using MyBoardGameServer.Core.Models;
 using MyBoardGameServer.Repositories;
 
 namespace MyBoardGameServer.Controllers

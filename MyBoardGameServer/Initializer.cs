@@ -97,7 +97,7 @@ namespace MyBoardGameServer
             using (var scope = app.Services.CreateScope())
             {
                 var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-                context.Users.Add(new Models.User { Username = "In-Memory User" });
+                context.Users.Add(new Core.Models.User { Username = "In-Memory User" });
                 context.SaveChanges();
             }
         }

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace MyBoardGameServer.Models
+namespace MyBoardGameServer.Core.Models
 {
     [Table("users")]
     public class User

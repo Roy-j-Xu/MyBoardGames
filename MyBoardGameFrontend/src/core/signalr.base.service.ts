@@ -1,18 +1,20 @@
 import { Injectable } from "@angular/core";
 import { HubConnection, HubConnectionBuilder } from "@microsoft/signalr";
+import { appConfig } from "../app/app.config";
 
 
 
-@Injectable({
-  providedIn: 'root',
-})
-export default class HubService {
+// @Injectable({
+//   providedIn: 'root',
+// })
+export class HubService {
     private _connection: HubConnection
+    private _subscribers: HubSubscriber[]
 
     constructor() {
         this._connection =
             new HubConnectionBuilder()
-                .withUrl('http://localhost:5114/games')
+                .withUrl(appConfig["hubUrl"])
                 .build()
         this._connection.on(
             "ReceiveMessage",
@@ -30,5 +32,8 @@ export default class HubService {
         await this._connection.invoke("NewMessage", user, message);
     }
 
+}
+
+class HubSubscriber {
 
 }
